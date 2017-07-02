@@ -1,0 +1,28 @@
+AliensRecorder.arff
+/out/
+model.model
+
+# ignore .idea
+/.idea/
+
+# ingore .DS_Store
+/.DS_Store
+
+#
+# From Java.gitignore
+#
+*.class
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java(J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs
+hs_err_pid*
