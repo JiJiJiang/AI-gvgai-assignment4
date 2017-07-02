@@ -19,15 +19,15 @@ import weka.core.Instances;
 
 public class Agent extends AbstractPlayer {
 
-    protected Classifier m_model;
+    //protected Classifier m_model;
     protected Random m_rnd;
     private static int SIMULATION_DEPTH = 20;
     private final HashMap<Integer, Types.ACTIONS> action_mapping;
     protected QPolicy m_policy;
-    protected int N_ACTIONS; // action数目
-    protected static Instances m_dataset; // 训练集
-    protected int m_maxPoolSize = 1000;
-    protected double m_gamma = 0.99;
+    protected int N_ACTIONS; // available action number
+    protected static Instances m_dataset;
+    protected int m_maxPoolSize = 200;//1000;
+    protected double m_gamma = 0.9;//0.99;
 
     public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         m_rnd = new Random();
@@ -36,6 +36,7 @@ public class Agent extends AbstractPlayer {
         action_mapping = new HashMap<Integer, Types.ACTIONS>();
         int i = 0;
         for (Types.ACTIONS action : stateObs.getAvailableActions()) {
+            //System.out.println(action);
             action_mapping.put(i, action);
             i++;
         }
@@ -46,7 +47,6 @@ public class Agent extends AbstractPlayer {
     }
 
     /**
-     *
      * Learning based agent.
      *
      * @param stateObs Observation of the current state.
@@ -61,6 +61,7 @@ public class Agent extends AbstractPlayer {
         Types.ACTIONS bestAction = null;
         try {
             double[] features = RLDataExtractor.featureExtract(stateObs);
+            // stateObs(features) to action(action_num)
             int action_num = m_policy.getActionNoExplore(features); // no exploration
             bestAction = action_mapping.get(action_num);
         } catch (Exception exc) {
@@ -71,6 +72,13 @@ public class Agent extends AbstractPlayer {
         return bestAction;
     }
 
+    /**
+     * sample (<=)20 training data
+     * @param stateObs
+     * @param heuristic
+     * @param policy
+     * @return (<=)20 training data
+     */
     private Instances simulate(StateObservation stateObs, StateHeuristic heuristic, QPolicy policy) {
 
         Instances data = new Instances(RLDataExtractor.datasetHeader(), 0);
@@ -122,8 +130,10 @@ public class Agent extends AbstractPlayer {
         for (depth = depth - 1; depth >= 0; depth--) {
             accQ += sequence[depth].classValue();
             sequence[depth].setClassValue(accQ);
-            data.add(sequence[depth]);
+            if(depth<sequence.length/5)data.add(sequence[depth]);
         }
+        //data.add(sequence[0]);
+
         return data;
     }
 
@@ -137,8 +147,8 @@ public class Agent extends AbstractPlayer {
             // get training data of the MC sampling
             Instances dataset = simulate(stateObs, heuristic, m_policy);
 
-            // update dataset
-            m_dataset.randomize(m_rnd);
+            // update dataset(no more than m_maxPoolSize=1000)
+            m_dataset.randomize(m_rnd);//shuffle
             for (int i = 0; i < dataset.numInstances(); i++) {
                 m_dataset.add(dataset.instance(i)); // add to the last
             }

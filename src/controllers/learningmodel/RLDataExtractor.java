@@ -51,7 +51,14 @@ public class RLDataExtractor {
         filewriter.write("@Data\n");*/
         
     }
-    
+
+    /**
+     * Complete all feature
+     * @param features: a piece of data recorder
+     * @param action: action index
+     * @param reward: Qvalue
+     * @return
+     */
     public static Instance makeInstance(double[] features, int action, double reward){
         features[872] = action;
         features[873] = reward;
@@ -59,12 +66,17 @@ public class RLDataExtractor {
         ins.setDataset(s_datasetHeader);
         return ins;
     }
-    
+
+    /**
+     * Extract feature from current obs to get a piece of data recorder(without initializing action and Qvalue)
+     * @param obs : current stateObservation
+     * @return
+     */
     public static double[] featureExtract(StateObservation obs){
-        
+
         double[] feature = new double[874];  // 868 + 4 + 1(action) + 1(Q)
-        
-        // 448 locations
+
+        // 868 locations
         int[][] map = new int[28][31];
         // Extract features
         LinkedList<Observation> allobj = new LinkedList<>();
@@ -74,7 +86,7 @@ public class RLDataExtractor {
             for(ArrayList<Observation> l : obs.getMovablePositions()) allobj.addAll(l);
         if( obs.getNPCPositions()!=null )
             for(ArrayList<Observation> l : obs.getNPCPositions()) allobj.addAll(l);
-        
+
         for(Observation o : allobj){
             Vector2d p = o.position;
             int x = (int)(p.x/20); //squre size is 20 for pacman
@@ -84,33 +96,40 @@ public class RLDataExtractor {
         for(int y=0; y<31; y++)
             for(int x=0; x<28; x++)
                 feature[y*28+x] = map[x][y];
-        
+
         // 4 states
         feature[868] = obs.getGameTick();
         feature[869] = obs.getAvatarSpeed();
         feature[870] = obs.getAvatarHealthPoints();
         feature[871] = obs.getAvatarType();
-        
+
         return feature;
     }
-    
+
+    /**
+     * Make training dataSet header.
+     * @return dataSetHeader(without data)
+     */
     public static Instances datasetHeader(){
         
         if (s_datasetHeader!=null)
             return s_datasetHeader;
-        
+
+        // 28*31 + 4 + 1 + 1 locations
         FastVector attInfo = new FastVector();
-        // 448 locations
+        // 28*31
         for(int y=0; y<28; y++){
             for(int x=0; x<31; x++){
                 Attribute att = new Attribute("object_at_position_x=" + x + "_y=" + y);
                 attInfo.addElement(att);
             }
         }
+        // 4
         Attribute att = new Attribute("GameTick" ); attInfo.addElement(att);
         att = new Attribute("AvatarSpeed" ); attInfo.addElement(att);
         att = new Attribute("AvatarHealthPoints" ); attInfo.addElement(att);
         att = new Attribute("AvatarType" ); attInfo.addElement(att);
+        // 1
         //action
         FastVector actions = new FastVector();
         actions.addElement("0");
@@ -119,6 +138,7 @@ public class RLDataExtractor {
         actions.addElement("3");
         att = new Attribute("actions", actions);        
         attInfo.addElement(att);
+        // 1
         // Q value
         att = new Attribute("Qvalue");
         attInfo.addElement(att);

@@ -80,7 +80,8 @@ public class QPolicy {
                     bestaction = action;
             }
         }
-        
+
+        // epsilon decreses ???
         // epsilon greedy
         if( m_rnd.nextDouble() < m_epsilon ){
             bestaction = m_rnd.nextInt(m_numActions);
