@@ -32,9 +32,12 @@ public class Assignment4
         CompetitionParameters.ACTION_TIME = 1000000;
         //ArcadeMachine.runOneGame(game, level, visuals, rlController, null, seed, false);
         //String level2 = gamesPath + games[gameIdx] + "_lvl" + 1 +".txt";
-        for(int i=0; i<10; i++){
-            String levelfile = level + "0.txt";
+        for(int i=0; i<5; i++){
+            String levelfile = level + i+".txt";
+            long start = System.currentTimeMillis();
             ArcadeMachine.runOneGame(game, levelfile, visuals, rlController, null, seed, false);
+            long end = System.currentTimeMillis();
+            System.out.println("Run time: "+((end-start)/1000)+" s");
         }
     }
 }

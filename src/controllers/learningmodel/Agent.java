@@ -26,8 +26,8 @@ public class Agent extends AbstractPlayer {
     protected QPolicy m_policy;
     protected int N_ACTIONS; // available action number
     protected static Instances m_dataset;
-    protected int m_maxPoolSize = 200;//1000;
-    protected double m_gamma = 0.9;//0.99;
+    protected int m_maxPoolSize = 50;//200;
+    protected double m_gamma = 0.99;//0.9;
 
     public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         m_rnd = new Random();
@@ -118,6 +118,7 @@ public class Agent extends AbstractPlayer {
 
         // get the predicted Q from the last state
         double accQ = 0;
+        /*
         if (!stateObs.isGameOver()) {
             try {
                 accQ = factor*policy.getMaxQ(RLDataExtractor.featureExtract(stateObs));
@@ -125,14 +126,15 @@ public class Agent extends AbstractPlayer {
                 exc.printStackTrace();
             }
         }
+        */
 
         // calculate the acumulated Q
         for (depth = depth - 1; depth >= 0; depth--) {
             accQ += sequence[depth].classValue();
             sequence[depth].setClassValue(accQ);
-            if(depth<sequence.length/5)data.add(sequence[depth]);
+            //if(depth<sequence.length/5)data.add(sequence[depth]);
         }
-        //data.add(sequence[0]);
+        data.add(sequence[0]);
 
         return data;
     }
@@ -141,14 +143,14 @@ public class Agent extends AbstractPlayer {
 
         // assume we need SIMULATION_DEPTH*10 milliseconds for one iteration
         int iter = 0;
-        while (iter++ <= 10 //truem_timer.remainingTimeMillis() > SIMULATION_DEPTH*10
+        while (iter++ < 50 //truem_timer.remainingTimeMillis() > SIMULATION_DEPTH*10
                 ) {
 
             // get training data of the MC sampling
             Instances dataset = simulate(stateObs, heuristic, m_policy);
 
             // update dataset(no more than m_maxPoolSize=1000)
-            m_dataset.randomize(m_rnd);//shuffle
+            //m_dataset.randomize(m_rnd);//shuffle
             for (int i = 0; i < dataset.numInstances(); i++) {
                 m_dataset.add(dataset.instance(i)); // add to the last
             }
