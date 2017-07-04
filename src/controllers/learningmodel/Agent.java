@@ -21,13 +21,13 @@ public class Agent extends AbstractPlayer {
 
     //protected Classifier m_model;
     protected Random m_rnd;
-    private static int SIMULATION_DEPTH = 20;
+    private static int SIMULATION_DEPTH = 15;
     private final HashMap<Integer, Types.ACTIONS> action_mapping;
     protected QPolicy m_policy;
     protected int N_ACTIONS; // available action number
     protected static Instances m_dataset;
-    protected int m_maxPoolSize = 1000;//200;
-    protected double m_gamma = 0.99;//0.9;
+    protected int m_maxPoolSize = 2000;//200;
+    protected double m_gamma = 0.95;//0.9;
 
     public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         m_rnd = new Random();
@@ -41,10 +41,8 @@ public class Agent extends AbstractPlayer {
             i++;
         }
 
-        RLDataExtractor.initStateObs=stateObs;
         N_ACTIONS = stateObs.getAvailableActions().size();
         m_policy = new QPolicy(N_ACTIONS);
-        RLDataExtractor.s_datasetHeader=RLDataExtractor.datasetHeader();
         m_dataset = new Instances(RLDataExtractor.s_datasetHeader);
     }
 
@@ -133,7 +131,6 @@ public class Agent extends AbstractPlayer {
             sequence[depth].setClassValue(accQ);
             data.add(sequence[depth]);
         }
-        //data.add(sequence[0]);
 
         return data;
     }
@@ -142,7 +139,7 @@ public class Agent extends AbstractPlayer {
 
         // assume we need SIMULATION_DEPTH*10 milliseconds for one iteration
         int iter = 0;
-        while (iter++ <= 10 //truem_timer.remainingTimeMillis() > SIMULATION_DEPTH*10
+        while (iter++ <= 20 //truem_timer.remainingTimeMillis() > SIMULATION_DEPTH*10
                 ) {
 
             // get training data of the MC sampling
@@ -157,6 +154,7 @@ public class Agent extends AbstractPlayer {
                 m_dataset.delete(0);
             }
         }
+        //m_dataset.randomize(m_rnd);//shuffle
         // train policy
         try {
             m_policy.fitQ(m_dataset);

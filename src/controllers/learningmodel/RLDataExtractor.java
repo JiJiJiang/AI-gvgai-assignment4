@@ -26,8 +26,7 @@ import weka.core.Instances;
  */
 public class RLDataExtractor {
     public FileWriter filewriter;
-    public static StateObservation initStateObs=null;
-    public static Instances s_datasetHeader = null;
+    public static Instances s_datasetHeader =datasetHeader();
     
     public RLDataExtractor(String filename) throws Exception{
         
