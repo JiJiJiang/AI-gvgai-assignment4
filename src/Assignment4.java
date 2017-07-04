@@ -3,6 +3,7 @@ import java.util.Random;
 import core.competition.CompetitionParameters;
 
 import core.ArcadeMachine;
+import ontology.effects.unary.Spawn;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,12 +33,16 @@ public class Assignment4
         CompetitionParameters.ACTION_TIME = 1000000;
         //ArcadeMachine.runOneGame(game, level, visuals, rlController, null, seed, false);
         //String level2 = gamesPath + games[gameIdx] + "_lvl" + 1 +".txt";
-        for(int i=0; i<5; i++){
-            String levelfile = level + i+".txt";
-            long start = System.currentTimeMillis();
-            ArcadeMachine.runOneGame(game, levelfile, visuals, rlController, null, seed, false);
-            long end = System.currentTimeMillis();
-            System.out.println("Run time: "+((end-start)/1000)+" s");
+        for(int j=0;j<4;j++) {
+            for (int i = 0; i < 5; i++) {
+                String levelfile = level + i + ".txt";
+                long start = System.currentTimeMillis();
+                ArcadeMachine.runOneGame(game, levelfile, visuals, rlController, null, seed, false);
+                long end = System.currentTimeMillis();
+                System.out.println("Run time: " + ((end - start) / 1000) + " s");
+            }
+            System.out.println();
+            System.out.println();
         }
     }
 }
